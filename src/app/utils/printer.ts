@@ -64,7 +64,7 @@ async function fetchWithTimeout(url: string, options: RequestInit, timeout: numb
 
 export async function searchBluetoothPrinters(): Promise<SearchResult> {
   try {
-    const response = await fetchWithTimeout('http://192.168.110.6:3000/devices', {
+    const response = await fetchWithTimeout('http://localhost:3000/devices', {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -122,7 +122,7 @@ export async function printReceipt({
     // Store the receipt data for potential reprint
     lastReceiptData = { deviceId, schoolName, title, items, total, footer, saleDate };
 
-    const response = await fetchWithTimeout('http://192.168.110.6:3000/print/receipt', {
+    const response = await fetchWithTimeout('http://localhost:3000/print/receipt', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
