@@ -8,7 +8,7 @@ function Logo() {
     <div>
       <div className="flex flex-col items-center justify-center mb-4">
         <img src="/images/logo.png" alt="Logo" className="h-50" />
-        <div className="text-sm text-gray-500">Opensource School Tuckshop Point of Sale System</div>
+        <div className="text-sm text-gray-500 text-center">Opensource School Tuckshop Point of Sale System</div>
     </div>
     <hr className="w-full border-gray-300" />
     </div>

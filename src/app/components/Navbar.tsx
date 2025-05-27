@@ -1,9 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { logoutUser } from "../pages/user/functions";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      const response = await logoutUser();
+      if (response.success) {
+        window.location.href = '/user/login';
+      }
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return (
     <nav className="bg-gray-800 text-white">
@@ -67,6 +79,12 @@ export function Navbar() {
             >
               Settings
             </a>
+            <button
+              onClick={handleLogout}
+              className="px-3 py-2 rounded-md bg-red-600 hover:bg-red-700"
+            >
+              Logout
+            </button>
           </div>
         </div>
 
@@ -89,12 +107,21 @@ export function Navbar() {
                 Reports
               </a>
               <a
-                href="/settings"
+                href="/user/settings"
                 className="block px-3 py-2 rounded-md hover:bg-gray-700"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Settings
               </a>
+              <button
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  handleLogout();
+                }}
+                className="w-full text-left px-3 py-2 rounded-md bg-red-600 hover:bg-red-700"
+              >
+                Logout
+              </button>
             </div>
           </div>
         )}
