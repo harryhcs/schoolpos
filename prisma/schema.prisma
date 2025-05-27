@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+
+  runtime                = "workerd"
+  moduleFormat           = "esm"
+  generatedFileExtension = "ts"
+  importFileExtension    = "ts"
+
+  output          = "../generated/prisma"
+  previewFeatures = ["queryCompiler", "driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String    @id @default(uuid())
+  username    String    @unique
+  password    String    // Hashed password
+  role        Role      @default(WORKER)
+  email       String?   // Optional email for notifications
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  sales       Sale[]    // Sales made by this user
+  settings    Settings[] // Settings updated by this user
+}
+
+enum Role {
+  ADMIN     // Can manage products and users
+  MANAGER   // Can view reports and do sales
+  WORKER    // Can only do sales
+}
+
+model Product {
+  id          String    @id @default(uuid())
+  name        String
+  price       Float
+  stock       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  saleItems   SaleItem[] // Items in sales
+}
+
+model Sale {
+  id          String    @id @default(uuid())
+  total       Float
+  amountPaid  Float
+  change      Float
+  createdAt   DateTime  @default(now())
+  userId      String    // User who made the sale
+  user        User      @relation(fields: [userId], references: [id])
+  items       SaleItem[]
+}
+
+model SaleItem {
+  id          String    @id @default(uuid())
+  quantity    Int
+  price       Float     // Price at time of sale
+  saleId      String
+  sale        Sale      @relation(fields: [saleId], references: [id])
+  productId   String
+  product     Product   @relation(fields: [productId], references: [id])
+}
+
+model Settings {
+  id          String    @id @default(uuid())
+  key         String    @unique
+  value       String
+  description String?
+  updatedAt   DateTime  @updatedAt
+  updatedBy   String    // User who last updated the setting
+  user        User      @relation(fields: [updatedBy], references: [id])
+}

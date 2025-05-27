@@ -1,0 +1,37 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "school-pos",
+  "main": "src/worker.tsx",
+  "compatibility_date": "2024-09-23",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "SESSION_DURABLE_OBJECT",
+        "class_name": "SessionDurableObject"
+      }
+    ]
+  },
+  "vars": {
+    "WEBAUTHN_APP_NAME": "school-pos"
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["SessionDurableObject"]
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "school-pos",
+      "database_id": "6057ff34-f5ea-423d-8314-e1c1e03aa172"
+    }
+  ]
+}
