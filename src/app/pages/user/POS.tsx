@@ -279,6 +279,11 @@ export function POS() {
     }
   };
 
+  const getCartQuantity = (productId: string) => {
+    const item = cart.find(item => item.product.id === productId);
+    return item?.quantity || 0;
+  };
+
   return (
     <MainLayout>
       <div className="flex justify-between items-center mb-4">
@@ -294,120 +299,143 @@ export function POS() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="flex flex-col lg:flex-row gap-4">
         {/* Product Selection */}
-        <div className="bg-white rounded-lg shadow p-4">
+        <div className="flex-1 bg-white rounded-lg shadow p-4">
           <h2 className="text-xl font-semibold mb-4">Products</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {products.map((product) => (
-              <button
-                key={product.id}
-                onClick={() => addToCart(product)}
-                disabled={product.stock === 0}
-                className={`p-3 border rounded-lg text-left ${
-                  product.stock === 0
-                    ? "bg-gray-100 text-gray-400"
-                    : "hover:bg-gray-50"
-                }`}
-              >
-                <div className="font-medium truncate">{product.name}</div>
-                <div className="text-sm">{formatPrice(product.price)}</div>
-                <div className="text-sm text-gray-500">
-                  Stock: {product.stock}
-                </div>
-              </button>
-            ))}
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-4 gap-2">
+            {products.map((product) => {
+              const quantity = getCartQuantity(product.id);
+              return (
+                <button
+                  key={product.id}
+                  onClick={() => addToCart(product)}
+                  disabled={product.stock === 0}
+                  className={`p-2 border rounded-lg text-left relative transition-colors ${
+                    product.stock === 0
+                      ? "bg-gray-100 text-gray-400"
+                      : quantity > 0
+                      ? "bg-blue-50 border-blue-200 hover:bg-blue-100"
+                      : "hover:bg-gray-50"
+                  }`}
+                >
+                  {quantity > 0 && (
+                    <div className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {quantity}
+                    </div>
+                  )}
+                  <div className="font-medium truncate text-sm">{product.name}</div>
+                  <div className="text-sm font-bold">{formatPrice(product.price)}</div>
+                  <div className="text-xs text-gray-500">
+                    Stock: {product.stock}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Cart */}
-        <div className="bg-white rounded-lg shadow p-4">
-          <h2 className="text-xl font-semibold mb-4">Current Sale</h2>
-          {cart.length === 0 ? (
-            <p className="text-gray-500">No items in cart</p>
-          ) : (
-            <>
-              <div className="space-y-2 mb-4 max-h-[50vh] overflow-y-auto">
-                {cart.map((item) => (
-                  <div
-                    key={item.product.id}
-                    className="flex items-center justify-between p-2 border rounded"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium truncate">{item.product.name}</div>
-                      <div className="text-sm text-gray-500">
-                        {formatPrice(item.product.price)} each
+        {/* Cart - Floating on mobile, side panel on desktop */}
+        <div className="w-full lg:w-[400px]">
+          <div className="bg-white rounded-lg shadow p-4 fixed bottom-0 left-0 right-0 lg:relative lg:bottom-auto lg:left-auto lg:right-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Current Sale</h2>
+              {cart.length > 0 && (
+                <button
+                  onClick={() => setCart([])}
+                  className="text-sm text-red-500 hover:text-red-600"
+                >
+                  Clear Cart
+                </button>
+              )}
+            </div>
+            
+            {cart.length === 0 ? (
+              <p className="text-gray-500">No items in cart</p>
+            ) : (
+              <>
+                <div className="space-y-2 mb-4 max-h-[200px] lg:max-h-[300px] overflow-y-auto">
+                  {cart.map((item) => (
+                    <div
+                      key={item.product.id}
+                      className="flex items-center justify-between p-2 border rounded"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium truncate">{item.product.name}</div>
+                        <div className="text-sm text-gray-500">
+                          {formatPrice(item.product.price)} each
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 ml-4">
+                        <button
+                          onClick={() =>
+                            updateQuantity(item.product.id, item.quantity - 1)
+                          }
+                          className="px-2 py-1 bg-gray-100 rounded"
+                        >
+                          -
+                        </button>
+                        <span className="w-8 text-center">
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() =>
+                            updateQuantity(item.product.id, item.quantity + 1)
+                          }
+                          className="px-2 py-1 bg-gray-100 rounded"
+                        >
+                          +
+                        </button>
+                        <button
+                          onClick={() => removeFromCart(item.product.id)}
+                          className="ml-2 text-red-500"
+                        >
+                          ×
+                        </button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 ml-4">
-                      <button
-                        onClick={() =>
-                          updateQuantity(item.product.id, item.quantity - 1)
-                        }
-                        className="px-2 py-1 bg-gray-100 rounded"
-                      >
-                        -
-                      </button>
-                      <span className="w-8 text-center">
-                        {item.quantity}
-                      </span>
-                      <button
-                        onClick={() =>
-                          updateQuantity(item.product.id, item.quantity + 1)
-                        }
-                        className="px-2 py-1 bg-gray-100 rounded"
-                      >
-                        +
-                      </button>
-                      <button
-                        onClick={() => removeFromCart(item.product.id)}
-                        className="ml-2 text-red-500"
-                      >
-                        ×
-                      </button>
-                    </div>
+                  ))}
+                </div>
+
+                <div className="border-t pt-4">
+                  <div className="flex justify-between font-semibold mb-4">
+                    <span>Total:</span>
+                    <span>{formatPrice(getTotal())}</span>
                   </div>
-                ))}
-              </div>
 
-              <div className="border-t pt-4">
-                <div className="flex justify-between font-semibold mb-4">
-                  <span>Total:</span>
-                  <span>{formatPrice(getTotal())}</span>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-1">
+                      Amount Paid
+                    </label>
+                    <input
+                      type="number"
+                      value={amountPaid}
+                      onChange={(e) => setAmountPaid(e.target.value)}
+                      placeholder="0.00"
+                      step="5"
+                      className="w-full p-2 border rounded"
+                    />
+                    {amountPaid && (
+                      <div className="mt-2 text-sm">
+                        <span className="text-gray-600">Change:</span>
+                        <span className={`ml-2 font-medium ${getChange() >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {formatPrice(getChange())}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={handleSale}
+                    disabled={isPending || cart.length === 0}
+                    className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+                  >
+                    {isPending ? "Processing..." : "Complete Sale"}
+                  </button>
                 </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium mb-1">
-                    Amount Paid
-                  </label>
-                  <input
-                    type="number"
-                    value={amountPaid}
-                    onChange={(e) => setAmountPaid(e.target.value)}
-                    placeholder="0.00"
-                    step="0.01"
-                    className="w-full p-2 border rounded"
-                  />
-                  {amountPaid && (
-                    <div className="mt-2 text-sm">
-                      <span className="text-gray-600">Change:</span>
-                      <span className={`ml-2 font-medium ${getChange() >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {formatPrice(getChange())}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <button
-                  onClick={handleSale}
-                  disabled={isPending || cart.length === 0}
-                  className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-                >
-                  {isPending ? "Processing..." : "Complete Sale"}
-                </button>
-              </div>
-            </>
-          )}
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -442,7 +470,7 @@ export function POS() {
 
       {/* Reprint Modal */}
       {showReprintModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
             <div className="p-4 border-b">
               <h2 className="text-xl font-semibold">Today's Receipts</h2>

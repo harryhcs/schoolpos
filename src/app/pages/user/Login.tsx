@@ -1,7 +1,20 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { loginUser, registerUser } from "./functions";
+import { loginUser } from "./functions";
+import MainLayout from "@/app/layouts/MainLayout";
+
+function Logo() {
+  return (
+    <div>
+      <div className="flex flex-col items-center justify-center mb-4">
+        <img src="/images/logo.png" alt="Logo" className="h-50" />
+        <div className="text-sm text-gray-500">Opensource School Tuckshop Point of Sale System</div>
+    </div>
+    <hr className="w-full border-gray-300" />
+    </div>
+  );
+}
 
 export function Login() {
   const [username, setUsername] = useState("");
@@ -16,17 +29,8 @@ export function Login() {
       setResult(response.error || "Login failed");
     } else {
       setResult("Login successful!");
+      window.location.href = "/";
       // You might want to redirect or update UI state here
-    }
-  };
-
-  const handleRegister = async () => {
-    const response = await registerUser(username, password);
-    
-    if (!response.success) {
-      setResult(response.error || "Registration failed");
-    } else {
-      setResult("Registration successful!");
     }
   };
 
@@ -34,49 +38,63 @@ export function Login() {
     startTransition(() => void handleLogin());
   };
 
-  const handlePerformRegister = () => {
-    startTransition(() => void handleRegister());
-  };
-
   return (
-    <div className="flex flex-col gap-4 max-w-sm mx-auto p-4">
-      <input
-        type="text"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        placeholder="Username"
-        className="p-2 border rounded"
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-        className="p-2 border rounded"
-      />
-      <div className="flex gap-2">
-        <button 
-          onClick={handlePerformLogin} 
-          disabled={isPending}
-          className="flex-1 p-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-        >
-          {isPending ? "..." : "Login"}
-        </button>
-        <button 
-          onClick={handlePerformRegister} 
-          disabled={isPending}
-          className="flex-1 p-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
-        >
-          {isPending ? "..." : "Register"}
-        </button>
-      </div>
-      {result && (
-        <div className={`p-2 rounded ${
-          result.includes("successful") ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-        }`}>
-          {result}
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
+        <Logo />
+        
+        <div className="space-y-6">
+          <div>
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              Username
+            </label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your username"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <button 
+            onClick={handlePerformLogin} 
+            disabled={isPending}
+            className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isPending ? "Signing in..." : "Sign In"}
+          </button>
         </div>
-      )}
+
+        {result && (
+          <div className={`mt-4 p-3 rounded-md ${
+            result.includes("successful") 
+              ? "bg-green-50 text-green-700 border border-green-200" 
+              : "bg-red-50 text-red-700 border border-red-200"
+          }`}>
+            {result}
+          </div>
+        )}
+
+        <div className="mt-6 text-center text-sm text-gray-500">
+          <p>© {new Date().getFullYear()} RedwoodJS. All rights reserved. Built with RedwoodSDK</p>
+        </div>
+      </div>
     </div>
   );
 }

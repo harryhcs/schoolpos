@@ -31,11 +31,15 @@ export function Products() {
 
   const loadProducts = async () => {
     const response = await getProducts();
-    if (response.success) {
+    if (response.success && response.products) {
       setProducts(response.products);
     } else {
       setError(response.error || "Failed to load products");
     }
+  };
+
+  const formatPrice = (price: number) => {
+    return `R${price.toFixed(0)}`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -200,7 +204,7 @@ export function Products() {
               onChange={(e) => setFormData({ ...formData, price: e.target.value })}
               placeholder="Price"
               className="p-2 border rounded"
-              step="0.01"
+              step="5"
               required
             />
             <input
@@ -268,7 +272,7 @@ export function Products() {
               {products.map((product) => (
                 <tr key={product.id} className="border-t">
                   <td className="px-4 py-2">{product.name}</td>
-                  <td className="px-4 py-2 text-right">${product.price.toFixed(2)}</td>
+                  <td className="px-4 py-2 text-right">{formatPrice(product.price)}</td>
                   <td className="px-4 py-2 text-right">{product.stock}</td>
                   <td className="px-4 py-2 text-center">
                     <button

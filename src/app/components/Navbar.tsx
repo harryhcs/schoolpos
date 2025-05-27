@@ -12,7 +12,7 @@ export function Navbar() {
           {/* Logo/Brand */}
           <div className="flex-shrink-0">
             <a href="/" className="text-xl font-bold">
-              School POS
+              <img src="/images/logo.png" alt="Logo" className="h-30" />
             </a>
           </div>
 
