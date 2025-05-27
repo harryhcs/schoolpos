@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import { loginUser } from "./functions";
-import MainLayout from "@/app/layouts/MainLayout";
 
 function Logo() {
   return (
