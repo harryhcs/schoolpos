@@ -7,4 +7,7 @@ export default defineConfig({
     ssr: {},
   },
   plugins: [redwood(), tailwindcss()],
+  server: {
+    allowedHosts: ['pos.local']
+  }
 });
