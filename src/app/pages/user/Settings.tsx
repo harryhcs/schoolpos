@@ -24,6 +24,7 @@ export function Settings() {
   const [success, setSuccess] = useState("");
   const [printers, setPrinters] = useState<PrinterDevice[]>([]);
   const [isSearchingPrinters, setIsSearchingPrinters] = useState(false);
+  const [printerError, setPrinterError] = useState("");
 
   useEffect(() => {
     loadSettings();
@@ -80,16 +81,16 @@ export function Settings() {
 
   const searchPrinters = async () => {
     setIsSearchingPrinters(true);
-    setError("");
+    setPrinterError("");
     try {
       const result = await searchBluetoothPrinters();
       if (result.success && result.devices) {
         setPrinters(result.devices);
       } else {
-        setError(result.error || "Failed to search for printers");
+        setPrinterError(result.error || "Failed to search for printers");
       }
     } catch (error) {
-      setError("Failed to search for printers. Make sure Bluetooth is enabled.");
+      setPrinterError("Failed to search for printers. Make sure Bluetooth is enabled.");
     } finally {
       setIsSearchingPrinters(false);
     }
@@ -154,6 +155,11 @@ export function Settings() {
                       {isSearchingPrinters ? "Searching..." : "Search Printers"}
                     </button>
                   </div>
+                  {printerError && (
+                    <div className="mt-2 p-2 bg-red-100 text-red-700 rounded">
+                      {printerError}
+                    </div>
+                  )}
                   <p className="mt-2 text-sm text-gray-500">
                     Click "Search Printers" to find available Bluetooth printers. Make sure your printer is turned on and in pairing mode.
                   </p>
